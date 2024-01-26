@@ -1,0 +1,21 @@
+---
+title: "Chapter1"
+author: "Toshihide Imaruoka"
+date: "2024-01-26"
+output:
+  rmdformats::downcute:
+    highlight: kate
+    css: mycss.css
+    dev: "ragg_png"
+---
+## 1 確率分布
+
+### 1.1 確率変数と確率
+- 確率変数
+  - 頻度という情報を持った変数
+  - 書き方
+    - 確率変数$X$
+    - 実現値$x$: 観測された値
+    - 確率変数$X$で$x$が起きる確率$Pr(X=x)$: サイコロで6が出る確率$Pr(X=6)$は$1/6$
+
+### 1.2 離散型確率変数

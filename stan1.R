@@ -3,17 +3,18 @@ library(rstan)
 rstan_options(auto_write=TRUE)
 options(mc.cores=parallel::detectCores())
 
-dat <- read.csv('dat2.csv')
+dat <- read.csv('dat1.csv')
 
+nsample<-nrow(dat)
 data_list<-list(k=dat$tf, N=10, n=nrow(dat))
 
 mcmc_result<-stan(
-  file='dat2.stan',
+  file='dat1.stan',
   data=data_list,
   seed=1,
   chains=3,
-  iter=3000,
-  warmup=1000,
+  iter=100,
+  warmup=0,
   thin=1
 )
 print(mcmc_result, probs=c(0.025,0.5,0.975))

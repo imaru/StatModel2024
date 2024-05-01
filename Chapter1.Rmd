@@ -8,9 +8,9 @@ output:
     css: mycss.css
     dev: "ragg_png"
 ---
-## 1 確率分布
+# 1 確率分布
 
-### 1.1 確率変数と確率
+## 1.1 確率変数と確率
 - 確率変数
   - 頻度という情報を持った変数
   - 書き方
@@ -18,4 +18,39 @@ output:
     - 実現値$x$: 観測された値
     - 確率変数$X$で$x$が起きる確率$Pr(X=x)$: サイコロで6が出る確率$Pr(X=6)$は$1/6$
 
-### 1.2 離散型確率変数
+## 1.2 離散型確率変数
+
+### 1.2.3 2項分布
+```{r}
+n<-10000
+p<-0.8
+size<-30
+dat<-rbinom(n,size,p)
+hist(dat)
+
+tbl<-dbinom(seq(0,8),8,.75)
+print(tbl)
+```
+### 1.2.4 ポアソン分布
+```{r}
+rambda<-5
+n=10000
+dat<-rpois(n,rambda)
+hist(dat)
+```
+## 1.3 連続型確率変数
+
+### 1.14 $\chi^2$分布、ガンマ分布
+```{r}
+x<-seq(0,15,0.01)
+df<-5
+dat<-dchisq(x,df)
+plot(x,dat,type='l')
+mu<-2
+nu<-1
+gdat<-dgamma(x,mu,nu)
+plot(x,gdat,type='l')
+```
+
+
+

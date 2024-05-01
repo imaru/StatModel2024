@@ -1637,9 +1637,7 @@ k=9)\)</span>はn回中kが9の確率（さっきの事後確率、今の事前�
 </ul></li>
 </ul>
 <pre class="r"><code>library(rstan)</code></pre>
-<pre><code>## Warning: パッケージ &#39;rstan&#39; はバージョン 4.3.3 の R の下で造られました</code></pre>
 <pre><code>##  要求されたパッケージ StanHeaders をロード中です</code></pre>
-<pre><code>## Warning: パッケージ &#39;StanHeaders&#39; はバージョン 4.3.3 の R の下で造られました</code></pre>
 <pre><code>## 
 ## rstan version 2.32.6 (Stan version 2.32.2)</code></pre>
 <pre><code>## For execution on a local, multicore CPU with excess RAM we recommend calling
@@ -1667,6 +1665,7 @@ mcmc_result&lt;-stan(
   warmup=0,
   thin=1
 )</code></pre>
+<pre><code>## hash mismatch so recompiling; make sure Stan code ends with a blank line</code></pre>
 <pre><code>## Warning: Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
 ## Running the chains for more iterations may help. See
 ## https://mc-stan.org/misc/warnings.html#bulk-ess</code></pre>
@@ -1682,7 +1681,7 @@ mcmc_result&lt;-stan(
 ## theta  0.83    0.01 0.11  0.58  0.84  0.98   137 1.00
 ## lp__  -5.99    0.07 0.78 -8.09 -5.65 -5.41   126 1.03
 ## 
-## Samples were drawn using NUTS(diag_e) at Wed May  1 11:58:19 2024.
+## Samples were drawn using NUTS(diag_e) at Wed May  1 17:57:30 2024.
 ## For each parameter, n_eff is a crude measure of effective sample size,
 ## and Rhat is the potential scale reduction factor on split chains (at 
 ## convergence, Rhat=1).</code></pre>

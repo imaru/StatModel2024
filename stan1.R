@@ -2,10 +2,11 @@ library(rstan)
 
 rstan_options(auto_write=TRUE)
 options(mc.cores=parallel::detectCores())
+rstan_options(auto_write = TRUE)
+
 
 dat <- read.csv('dat1.csv')
 
-nsample<-nrow(dat)
 data_list<-list(k=dat$tf, N=10, n=nrow(dat))
 
 mcmc_result<-stan(

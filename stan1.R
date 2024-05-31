@@ -14,8 +14,8 @@ mcmc_result<-stan(
   data=data_list,
   seed=1,
   chains=3,
-  iter=100,
-  warmup=0,
+  iter=4000,
+  warmup=1000,
   thin=1
 )
 print(mcmc_result, probs=c(0.025,0.5,0.975))

@@ -13,6 +13,7 @@ parameters {
 
 // explicitly define prior distribution
 model {
-    theta ~ uniform(0, 1);
+    //theta ~ uniform(0, 1);
+    theta ~ beta(1, 1);
     k~binomial(N,theta);
 }

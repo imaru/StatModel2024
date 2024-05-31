@@ -1,0 +1,79 @@
+---
+title: "BayesianCognitiveModeling3"
+output:
+  rmdformats::downcute:
+    highlight: kate
+    css: mycss.css
+    dev: "ragg_png"
+date: "2024-05-29"
+---
+# 第三章 二項分布を使った推論
+
+## 3.1 比率を推論する
+  - 2章の例を使う
+    - n=10, k=5（10回試行で5回成功の二項分布過程）
+
+```{r}
+library(rstan)
+
+rstan_options(auto_write=TRUE)
+options(mc.cores=parallel::detectCores())
+rstan_options(auto_write = TRUE)
+
+
+dat <- data.frame(5) #read.csv('dat1.csv')
+colnames(dat)<-'tf'
+
+nsample<-nrow(dat)
+data_list<-list(k=dat$tf, N=10, n=nrow(dat))
+
+mcmc_result<-stan(
+  file='dat1.stan',
+  data=data_list,
+  seed=1,
+  chains=2,
+  iter=20000,
+  warmup=1000,
+  thin=1
+)
+print(mcmc_result, probs=c(0.025,0.5,0.975))
+traceplot(mcmc_result)
+stan_hist(mcmc_result)
+stan_dens(mcmc_result)
+
+```
+## 3.2 2つの比率の差
+- 2つの異なる成功率$\theta_1$と$\theta_2$, 当然異なる成功回数$k_1$と$k_2$。
+  - その差$\delta=\theta_1-\theta_2$に関心がある
+  - $K_1=5, k_2=7$, $n_1,n_2=10$として$\delta$を考えてみる
+  
+```{r}
+library(rstan)
+
+rstan_options(auto_write=TRUE)
+options(mc.cores=parallel::detectCores())
+rstan_options(auto_write = TRUE)
+
+
+dat2 <- data.frame(t(c(5,7))) #read.csv('dat1.csv')
+colnames(dat2)<-c('tf1','tf2')
+
+nsample<-nrow(dat2)
+data_list2<-list(k1=dat2$tf1, k2=dat2$tf2, n1=10, n2=10)
+
+mcmc_result2<-stan(
+  file='dat32.stan',
+  data=data_list2,
+  seed=1,
+  chains=2,
+  iter=20000,
+  warmup=1000,
+  thin=1
+)
+print(mcmc_result2, probs=c(0.025,0.5,0.975))
+traceplot(mcmc_result2)
+stan_hist(mcmc_result2)
+stan_dens(mcmc_result2)
+
+```
+

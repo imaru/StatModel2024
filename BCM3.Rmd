@@ -77,3 +77,80 @@ stan_dens(mcmc_result2)
 
 ```
 
+## 共通の比率を推論する
+
+- nとkはさっきと同じで、ただし$\theta$は共通だと考える
+
+```{r}
+library(rstan)
+
+rstan_options(auto_write=TRUE)
+options(mc.cores=parallel::detectCores())
+rstan_options(auto_write = TRUE)
+
+
+dat3 <- data.frame(t(c(5,7))) #read.csv('dat1.csv')
+colnames(dat3)<-c('tf1','tf2')
+
+nsample<-nrow(dat3)
+data_list3<-list(k1=dat3$tf1, k2=dat3$tf2, n1=10, n2=10)
+
+mcmc_result3<-stan(
+  file='dat33.stan',
+  data=data_list3,
+  seed=1,
+  chains=2,
+  iter=20000,
+  warmup=1000,
+  thin=1
+)
+print(mcmc_result3, probs=c(0.025,0.5,0.975))
+traceplot(mcmc_result3)
+stan_hist(mcmc_result3)
+stan_dens(mcmc_result3)
+```
+## 事前と事後の予測
+
+- 事前分布、事後分布
+- 事前予測分布, 事後予測分布
+- n=15, k=1という例で
+
+```{r}
+library(rstan)
+
+rstan_options(auto_write=TRUE)
+options(mc.cores=parallel::detectCores())
+rstan_options(auto_write = TRUE)
+
+
+dat4 <- data.frame(1) #read.csv('dat1.csv')
+colnames(dat4)<-'tf1'
+data_list4<-list(k=dat4$tf1, n=15)
+
+mcmc_result4<-stan(
+  file='dat34.stan',
+  data=data_list4,
+  seed=1,
+  chains=2,
+  iter=20000,
+  warmup=1000,
+  thin=1
+)
+print(mcmc_result4, probs=c(0.025,0.5,0.975))
+#traceplot(mcmc_result4)
+#stan_hist(mcmc_result4)
+stan_dens(mcmc_result4)
+
+priorpredk<-extract(mcmc_result4)$priorpredk
+postpredk<-extract(mcmc_result4)$postpredk
+
+barplot(table(priorpredk))
+barplot(table(postpredk))
+
+```
+
+## 事後予測
+2つの極端な事象(n1=10, k1=0, n2=10, k2=10)が同じ二項過程（1つの$\theta$から生じたと考えると、推定された$\theta$はデータと合わないよね、的な話。
+
+## 同時分布
+未知の変数が2種類ある場合。成功率$\theta$と総観測数$n$。

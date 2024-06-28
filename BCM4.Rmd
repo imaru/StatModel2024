@@ -1,0 +1,54 @@
+---
+title: "BayesianCognitiveModeling4"
+output:
+  rmdformats::downcute:
+    highlight: kate
+    css: mycss.css
+    dev: "ragg_png"
+date: "2024-06-28"
+---
+## 
+
+```{r}
+x <- c(1.1, 1.9, 2.3, 1.8)
+n <- length(x)
+
+data <- list(x=x, n=n) # to be passed on to Stan
+myinits <- list(
+  list(mu=0, sigma=1))
+
+# parameters to be monitored: 
+parameters <- c("mu", "sigma")
+
+# The following command calls Stan with specific options.
+# For a detailed description type "?rstan".
+model<-cmdstan_model('dat41.stan')
+fit<-model$sample(data,
+                  #init = myinits,
+                  iter_warmup = 1000,
+                  iter_sampling = 1000,
+                  chains = 4,
+                  parallel_chains = 4,
+                  refresh = 4)
+
+fit$print()
+
+
+library(rstan)
+samples <- stan(file='dat41.stan',   
+                data=data, 
+                init=myinits,  # If not specified, gives random inits
+                pars=parameters,
+                iter=10000, 
+                chains=1, 
+                thin=1,
+                # warmup = 100,  # Stands for burn-in; Default = iter/2
+                # seed = 123  # Setting seed; Default is random seed
+                )
+# Now the values for the monitored parameters are in the "samples" object, 
+# ready for inspection.
+
+mu <- extract(samples)$mu
+sigma <- extract(samples)$sigma 
+```
+

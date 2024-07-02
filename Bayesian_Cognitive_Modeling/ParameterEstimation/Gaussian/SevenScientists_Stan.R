@@ -52,4 +52,4 @@ samples <- stan(model_code=model,
 )
 # Now the values for the monitored parameters are in the "samples" object, 
 # ready for inspection.
-
+print(samples)

@@ -7,14 +7,19 @@ output:
     dev: "ragg_png"
 date: "2024-06-28"
 ---
-## 
+## 4.1 平均と標準偏差を推測する
+- $n$個のデータから正規分布の平均と精度を推定
+  - WinBUGは正規分布のパラメータを平均と精度（$\lambda=1/\sigma^2$）
+  - cmdstanrではiteration
 
 ```{r}
+library(cmdstanr)
 x <- c(1.1, 1.9, 2.3, 1.8)
 n <- length(x)
 
 data <- list(x=x, n=n) # to be passed on to Stan
 myinits <- list(
+  list(mu=0, sigma=1),
   list(mu=0, sigma=1))
 
 # parameters to be monitored: 
@@ -24,31 +29,92 @@ parameters <- c("mu", "sigma")
 # For a detailed description type "?rstan".
 model<-cmdstan_model('dat41.stan')
 fit<-model$sample(data,
-                  #init = myinits,
+#                  init = myinits,
                   iter_warmup = 1000,
-                  iter_sampling = 1000,
-                  chains = 4,
-                  parallel_chains = 4,
+                  iter_sampling = 4000,
+                  chains = 1,
+                  parallel_chains = 2,
                   refresh = 4)
 
 fit$print()
+p <- bayesplot::mcmc_trace(fit$draws(c('mu','sigma')))
+
+# library(rstan)
+# samples <- stan(file='dat41.stan',   
+#                 data=data, 
+#                 init=myinits,  # If not specified, gives random inits
+#                 pars=parameters,
+#                 iter=10000, 
+#                 chains=2, 
+#                 thin=1,
+#                 # warmup = 100,  # Stands for burn-in; Default = iter/2
+#                 # seed = 123  # Setting seed; Default is random seed
+#                 )
+# # Now the values for the monitored parameters are in the "samples" object, 
+# # ready for inspection.
+# 
+# mu <- extract(samples)$mu
+# sigma <- extract(samples)$sigma 
+```
+
+## 4.2 七人の科学者
+
+- 
+
+```{r}
+x <- c(-27.020, 3.570, 8.191, 9.898, 9.603, 9.945, 10.056)
+n <- length(x)
+
+data <- list(x=x, n=n) # to be passed on to Stan
+myinits <- list(
+  list(mu=0, lambda=rep(1,n)))
+parameters <- c("mu", "sigma")
+
+model2<-cmdstan_model('dat42.stan')
+fit2<-model2$sample(data,
+                  init = myinits,
+                  iter_warmup = 1000,
+                  iter_sampling = 4000,
+                  chains = 1,
+                  parallel_chains = 4,
+                  refresh = 4)
+
+fit2$print(parameters)
+
+library(ggplot2)
+
+p <- bayesplot::mcmc_trace(fit2$draws(c('mu','sigma','lambda')))
+plot(p)
 
 
-library(rstan)
-samples <- stan(file='dat41.stan',   
-                data=data, 
-                init=myinits,  # If not specified, gives random inits
-                pars=parameters,
-                iter=10000, 
-                chains=1, 
-                thin=1,
-                # warmup = 100,  # Stands for burn-in; Default = iter/2
-                # seed = 123  # Setting seed; Default is random seed
-                )
-# Now the values for the monitored parameters are in the "samples" object, 
-# ready for inspection.
+```
 
-mu <- extract(samples)$mu
-sigma <- extract(samples)$sigma 
+## 4.3 IQの繰り返し測定
+
+```{r}
+x <- matrix(c(90, 95, 100, 105, 110, 115, 150, 155, 160), 
+      nrow=3, ncol=3, byrow=T) 
+
+
+n <- nrow(x) # number of people
+m <- ncol(x) # number of repeated measurements
+
+data <- list(x=x, n=n, m=m) # to be passed on to Stan
+myinits <- list(
+  list(mu=rep(100, n), sigma=1))
+
+# parameters to be monitored: 
+parameters <- c("mu", "sigma")
+
+model3<-cmdstan_model('dat43.stan')
+fit3<-model3$sample(data,
+                  init = myinits,
+                  iter_warmup = 1000,
+                  iter_sampling = 4000,
+                  chains = 1,
+                  parallel_chains = 4,
+                  refresh = 4)
+
+fit3$print(parameters)
 ```
 

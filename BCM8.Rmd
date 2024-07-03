@@ -10,6 +10,8 @@ date: "2024-07-02"
 ## 8.1 一標本比較
 
 ```{r}
+rm(list=ls())
+
 library(cmdstanr)
 library(ggplot2)
 library(dplyr)
@@ -46,15 +48,47 @@ model<-cmdstan_model('dat81.stan')
 fit<-model$sample(data,
                   init = myinits,
                   iter_warmup = 1000,
-                  iter_sampling = 4000,
+                  iter_sampling = 10000,
                   chains = 3,
                   parallel_chains = 4,
-                  refresh = 4)
+                  refresh = 500)
+
+# model_n<-cmdstan_model('dat81n.stan')
+# fit_n<-model_n$sample(data,
+#                   init = myinits,
+#                   iter_warmup = 1000,
+#                   iter_sampling = 10000,
+#                   chains = 3,
+#                   parallel_chains = 4,
+#                   refresh = 500)
+
+# fit_n$print(parameters)
+# # bridge sampling
+# fit_n.sf <- rstan::read_stan_csv(fit_n$output_files())
+# path<-model$stan_file()
+# sf<-rstan::stan(path, data=data, chains =0)
+
 
 fit$print(parameters)
 #p <- bayesplot::mcmc_trace(fit$draws(c('mu','delta')))
 fit$draws('delta')%>%mcmc_trace
 fit$draws('delta')%>%mcmc_hist
+
+delta.posterior<-fit$draws('delta')
+
+#============ BFs based on logspline fit ===========================
+library(logspline) # this package can be installed from within R
+fit.posterior <- logspline(delta.posterior)
+
+# 95% confidence interval:
+x0 <- qlogspline(0.025,fit.posterior)
+x1 <- qlogspline(0.975,fit.posterior)
+
+posterior <- dlogspline(0, fit.posterior) # this gives the pdf at point delta = 0
+prior     <- dcauchy(0)          # height of order-restricted prior at delta = 0
+BF01      <- posterior/prior
+BF01
+
 
 ```
 

@@ -32,9 +32,9 @@ fit<-model$sample(data,
 #                  init = myinits,
                   iter_warmup = 1000,
                   iter_sampling = 10000,
-                  chains = 1,
-                  parallel_chains = 2,
-                  refresh = 4)
+                  chains = 4,
+                  parallel_chains = 4,
+                  refresh = 100)
 
 fit$print()
 p <- bayesplot::mcmc_trace(fit$draws(c('mu','sigma')))

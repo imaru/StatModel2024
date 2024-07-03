@@ -7,27 +7,54 @@ output:
     dev: "ragg_png"
 date: "2024-07-02"
 ---
+## 8.1 一標本比較
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r}
+library(cmdstanr)
+library(ggplot2)
+library(dplyr)
+library(bayesplot)
+library(bridgesampling)
+
+# Read data Dr. Smith
+Winter <- c(-0.05,0.41,0.17,-0.13,0.00,-0.05,0.00,0.17,0.29,0.04,0.21,0.08,0.37,
+            0.17,0.08,-0.04,-0.04,0.04,-0.13,-0.12,0.04,0.21,0.17,0.17,0.17,
+            0.33,0.04,0.04,0.04,0.00,0.21,0.13,0.25,-0.05,0.29,0.42,-0.05,0.12,
+            0.04,0.25,0.12)
+
+Summer <- c(0.00,0.38,-0.12,0.12,0.25,0.12,0.13,0.37,0.00,0.50,0.00,0.00,-0.13,
+            -0.37,-0.25,-0.12,0.50,0.25,0.13,0.25,0.25,0.38,0.25,0.12,0.00,0.00,
+            0.00,0.00,0.25,0.13,-0.25,-0.38,-0.13,-0.25,0.00,0.00,-0.12,0.25,
+            0.00,0.50,0.00)
+
+x <- Winter - Summer  # allowed because it is a within-subjects design
+x <- x / sd(x)        # standardize
+
+n <- length(Winter) # number of subjects
+
+data <- list(x=x, n=n) # to be passed on to Stan
+
+myinits <- list(
+  list(delta=rnorm(1,0,3), deltaprior=rnorm(1,0,3), sigmatmp = rnorm(1,0,1)),
+  list(delta=rnorm(1,0,3), deltaprior=rnorm(1,0,3), sigmatmp = rnorm(1,0,1)),
+  list(delta=rnorm(1,0,3), deltaprior=rnorm(1,0,3), sigmatmp = rnorm(1,0,1)))
+
+# Parameters to be monitored
+parameters <- c("delta")
+
+model<-cmdstan_model('dat81.stan')
+fit<-model$sample(data,
+                  init = myinits,
+                  iter_warmup = 1000,
+                  iter_sampling = 4000,
+                  chains = 3,
+                  parallel_chains = 4,
+                  refresh = 4)
+
+fit$print(parameters)
+#p <- bayesplot::mcmc_trace(fit$draws(c('mu','delta')))
+fit$draws('delta')%>%mcmc_trace
+fit$draws('delta')%>%mcmc_hist
+
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
